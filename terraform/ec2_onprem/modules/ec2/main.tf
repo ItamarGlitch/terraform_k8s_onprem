@@ -61,18 +61,18 @@ resource "aws_security_group_rule" "allow_k8s_api_ingress" {
 }
 
 resource "aws_instance" "this" {
-  for_each = toset(var.instance_names)
+  for_each = var.instance_configs
 
   ami                         = data.aws_ssm_parameter.ubuntu_24_ami.value
-  instance_type               = "t3.xlarge"
+  instance_type               = each.value.instance_type
   key_name                    = aws_key_pair.ec2.key_name
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   associate_public_ip_address = true
 
   root_block_device {
-    volume_size = 50
-    volume_type = "gp3"
+    volume_size = each.value.volume.size
+    volume_type = each.value.volume.type
   }
 
   tags = {
