@@ -1,6 +1,17 @@
-variable "instance_names" {
-  description = "Unique names for each EC2 instance. Add or remove names to scale instances."
-  type        = list(string)
+variable "instance_configs" {
+  description = "Map of instance configurations. Key is the instance name."
+  type = map(object({
+    instance_type    = string
+    root_volume_size = number
+    root_volume_type = string
+    additional_security_rules = optional(list(object({
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_blocks = list(string)
+      description = string
+    })), [])
+  }))
 }
 
 variable "vpc_id" {

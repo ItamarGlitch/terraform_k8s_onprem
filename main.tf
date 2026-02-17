@@ -50,7 +50,7 @@ locals {
 module "ec2" {
   source = "./modules/ec2"
 
-  instance_names = var.instance_names
-  vpc_id         = local.vpc_id
-  subnet_id      = local.subnet_id
+  instance_configs = var.instance_configs
+  vpc_id           = local.vpc_id
+  subnet_id        = local.subnet_id
 }
