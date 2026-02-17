@@ -1,4 +1,4 @@
 account_id  = "657840740617"
 environment = "stage"
 
-instance_names = []
+instance_configs = {}
