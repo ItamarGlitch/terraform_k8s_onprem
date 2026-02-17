@@ -5,7 +5,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
     tls = {
       source  = "hashicorp/tls"
@@ -19,29 +19,11 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
-}
+  region = "us-east-1"
 
-data "aws_vpcs" "available" {
-  filter {
-    name   = "state"
-    values = ["available"]
+  default_tags {
+    tags = local.common_tags
   }
-}
-
-locals {
-  vpc_id = var.vpc_id != null ? var.vpc_id : tolist(data.aws_vpcs.available.ids)[0]
-}
-
-data "aws_subnets" "selected" {
-  filter {
-    name   = "vpc-id"
-    values = [local.vpc_id]
-  }
-}
-
-locals {
-  subnet_id = var.subnet_id != null ? var.subnet_id : tolist(data.aws_subnets.selected.ids)[0]
 }
 
 module "ec2" {

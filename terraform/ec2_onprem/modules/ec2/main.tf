@@ -1,7 +1,3 @@
-data "aws_ssm_parameter" "ubuntu_24_ami" {
-  name = "/aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id"
-}
-
 resource "tls_private_key" "ec2" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -22,27 +18,46 @@ resource "aws_security_group" "ec2" {
   name        = "ec2-ssh-https-${replace(var.vpc_id, "vpc-", "")}"
   description = "Allow SSH and HTTPS for EC2 instances"
   vpc_id      = var.vpc_id
+}
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "allow_all_egress" {
+  security_group_id = aws_security_group.ec2.id
+  description       = "Allow all outbound traffic"
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
 
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "allow_ssh_ingress" {
+  security_group_id = aws_security_group.ec2.id
+  description       = "Allow SSH inbound traffic"
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "allow_https_ingress" {
+  security_group_id = aws_security_group.ec2.id
+  description       = "Allow HTTPS inbound traffic"
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "allow_k8s_api_ingress" {
+  security_group_id = aws_security_group.ec2.id
+  description       = "Allow Kubernetes API server inbound traffic"
+  type              = "ingress"
+  from_port         = 6443
+  to_port           = 6443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_instance" "this" {
