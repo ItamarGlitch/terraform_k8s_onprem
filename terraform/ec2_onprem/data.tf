@@ -1,12 +1,8 @@
-data "aws_vpcs" "available" {
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-}
-data "aws_subnets" "selected" {
-  filter {
-    name   = "vpc-id"
-    values = [local.vpc_id]
+data "terraform_remote_state" "vpc" {
+  backend = "s3"
+  config = {
+    bucket = "${var.account_id}-tfstate"
+    region = "us-east-1"
+    key    = "platform/vpc.tfstate"
   }
 }

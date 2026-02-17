@@ -1,13 +1,14 @@
 locals {
   common_tags = {
-    # "Owner"       = "gal.r@elsight.com"
-    # "Environment" = local.environment
-    # "Project"     = "infra"
-    # "ManagedBy"   = "Terraform"
-    # "Component"   = "iam-github-oidc"
-    # "GitRepo"     = "github.com/elsight/devops-aws-infra"
-    # "RemoteState" = "configuration/${local.environment}/iam-github-oidc.tfstate"
+    "Owner"       = "gal.r@elsight.com"
+    "Environment" = var.environment
+    "Project"     = "infra-ec2-onprem"
+    "ManagedBy"   = "Terraform"
+    "Component"   = "ec2_onprem"
+    "GitRepo"     = "github.com/elsight/terraform_k8s_onprem"
+    "RemoteState" = "services/${var.environment}/terraform_k8s_onprem/ec2_onprem.tfstate"
   }
-  vpc_id    = var.vpc_id != null ? var.vpc_id : tolist(data.aws_vpcs.available.ids)[0]
-  subnet_id = var.subnet_id != null ? var.subnet_id : tolist(data.aws_subnets.selected.ids)[0]
+  region    = "us-east-1"
+  vpc_id    = data.terraform_remote_state.vpc.outputs.vpc_id[local.region]
+  subnet_id  = data.terraform_remote_state.vpc.outputs.public_subnet_ids[local.region][0]
 }

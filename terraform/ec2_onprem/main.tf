@@ -18,14 +18,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = "us-east-1"
-
-  default_tags {
-    tags = local.common_tags
-  }
-}
-
 module "ec2" {
   source = "./modules/ec2"
 
